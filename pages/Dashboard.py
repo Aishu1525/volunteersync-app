@@ -1,6 +1,97 @@
 import streamlit as st
 import random
+st.markdown("""
+<style>
 
+/* 🌈 Main Background */
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(135deg, #eef2ff, #e0f7fa, #f5f3ff);
+}
+
+/* 🧊 MODERN SIDEBAR (Glass Effect) */
+[data-testid="stSidebar"] {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-right: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Sidebar text */
+[data-testid="stSidebar"] * {
+    color: #334155;
+}
+
+/* 🟣 Title */
+h1 {
+    color: #4f46e5;
+    text-align: center;
+    font-weight: 700;
+}
+
+/* 🔹 Subheading */
+h3 {
+    color: #475569;
+}
+
+/* 🧊 Cards */
+.card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    margin-top: 20px;
+}
+
+/* 🔘 Buttons (Main area) */
+.stButton > button {
+    background: linear-gradient(90deg, #6366f1, #22c55e);
+    color: white;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: 0.3s;
+}
+
+/* ✨ Hover */
+.stButton > button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+/* 🧭 SIDEBAR BUTTONS (make them look like nav items) */
+[data-testid="stSidebar"] .stButton > button {
+    width: 100%;
+    background: transparent;
+    color: #334155;
+    text-align: left;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 500;
+}
+
+/* Sidebar button hover */
+[data-testid="stSidebar"] .stButton > button:hover {
+    background: #e0f2fe;
+    transform: none;
+}
+
+/* Inputs */
+input, textarea {
+    border-radius: 10px !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Alerts */
+.stSuccess { background-color: #dcfce7 !important; }
+.stInfo { background-color: #e0f2fe !important; }
+.stWarning { background-color: #fef9c3 !important; }
+.stError { background-color: #fee2e2 !important; }
+
+</style>
+""", unsafe_allow_html=True)
 st.set_page_config(layout="wide")
 
 # Check login
@@ -16,30 +107,6 @@ st.subheader(f"Welcome, {user['name']} 👋")
 # Initialize tasks
 if "tasks" not in st.session_state:
     st.session_state.tasks = []
-
-# ---------------------------
-# CREATE TASK (LIVE DATA)
-# ---------------------------
-st.markdown("## 📌 Create New Task")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    task_name = st.text_input("Task Title")
-    task_location = st.text_input("Task Location")
-
-with col2:
-    task_skill = st.selectbox("Required Skill", ["Medical", "Food Distribution", "Logistics", "Teaching"])
-    task_urgency = st.selectbox("Urgency", ["High", "Medium", "Low"])
-
-if st.button("➕ Add Task"):
-    st.session_state.tasks.append({
-        "task": task_name,
-        "location": task_location,
-        "skill": task_skill,
-        "urgency": task_urgency
-    })
-    st.success("✅ Task Added Successfully!")
 
 # ---------------------------
 # AVAILABILITY
@@ -129,3 +196,4 @@ if st.button("🎲 Get Motivation"):
 # ---------------------------
 if random.random() > 0.7:
     st.info("⚡ New urgent request just arrived!")
+
