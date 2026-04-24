@@ -1,14 +1,23 @@
 import streamlit as st
+import pandas as pd
+
 import random
+
+# ---------------------------
+# PAGE CONFIG (MUST BE FIRST)
+# ---------------------------
+st.set_page_config(layout="wide")
+
+# ---------------------------
+# CSS
+# ---------------------------
 st.markdown("""
 <style>
 
-/* 🌈 Main Background */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg, #eef2ff, #e0f7fa, #f5f3ff);
 }
 
-/* 🧊 MODERN SIDEBAR (Glass Effect) */
 [data-testid="stSidebar"] {
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(14px);
@@ -16,35 +25,16 @@ st.markdown("""
     border-right: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Sidebar text */
 [data-testid="stSidebar"] * {
     color: #334155;
 }
 
-/* 🟣 Title */
 h1 {
     color: #4f46e5;
     text-align: center;
     font-weight: 700;
 }
 
-/* 🔹 Subheading */
-h3 {
-    color: #475569;
-}
-
-/* 🧊 Cards */
-.card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    padding: 24px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.3);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    margin-top: 20px;
-}
-
-/* 🔘 Buttons (Main area) */
 .stButton > button {
     background: linear-gradient(90deg, #6366f1, #22c55e);
     color: white;
@@ -52,67 +42,118 @@ h3 {
     border: none;
     font-weight: 600;
     padding: 8px 16px;
-    transition: 0.3s;
 }
 
-/* ✨ Hover */
 .stButton > button:hover {
     transform: scale(1.05);
     opacity: 0.9;
 }
 
-/* 🧭 SIDEBAR BUTTONS (make them look like nav items) */
-[data-testid="stSidebar"] .stButton > button {
-    width: 100%;
-    background: transparent;
-    color: #334155;
-    text-align: left;
-    border-radius: 10px;
-    padding: 10px;
-    font-weight: 500;
-}
-
-/* Sidebar button hover */
-[data-testid="stSidebar"] .stButton > button:hover {
-    background: #e0f2fe;
-    transform: none;
-}
-
-/* Inputs */
 input, textarea {
     border-radius: 10px !important;
     border: 1px solid #e5e7eb !important;
 }
 
-/* Alerts */
-.stSuccess { background-color: #dcfce7 !important; }
-.stInfo { background-color: #e0f2fe !important; }
-.stWarning { background-color: #fef9c3 !important; }
-.stError { background-color: #fee2e2 !important; }
-
 </style>
 """, unsafe_allow_html=True)
-st.set_page_config(layout="wide")
 
-# Check login
-if not st.session_state.get("logged_in", False):
+# ---------------------------
+# SAFE SESSION INIT (IMPORTANT FIX)
+# ---------------------------
+if "users" not in st.session_state:
+    st.session_state.users = {}
+
+if "tasks" not in st.session_state:
+    st.session_state.tasks = []
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if "current_user" not in st.session_state:
+    st.session_state.current_user = None
+
+# ---------------------------
+# CHECK LOGIN
+# ---------------------------
+if not st.session_state.logged_in:
     st.warning("⚠️ Please login first!")
     st.stop()
 
-user = st.session_state.users[st.session_state.current_user]
+user = st.session_state.users.get(st.session_state.current_user)
 
+if not user:
+    st.error("User not found. Please login again.")
+    st.stop()
+
+# ---------------------------
+# TITLE
+# ---------------------------
 st.title("⚡ Volunteer Dashboard")
 st.subheader(f"Welcome, {user['name']} 👋")
 
-# Initialize tasks
+# ---------------------------
+# SAFE TASKS
+# ---------------------------
+# ---------------------------
+# SAFE TASKS + SAMPLE DATA
+# ---------------------------
 if "tasks" not in st.session_state:
     st.session_state.tasks = []
+
+# 👉 Add demo tasks if empty (for dashboard testing)
+if len(st.session_state.tasks) == 0:
+    st.session_state.tasks = [
+        {
+            "task": "Medical Camp Support",
+            "location": "Guntur",
+            "skill": "Medical",
+            "urgency": "High"
+        },
+        {
+            "task": "Food Distribution Drive",
+            "location": "Vijayawada",
+            "skill": "Food Distribution",
+            "urgency": "Medium"
+        },
+        {
+            "task": "School Teaching Support",
+            "location": "Guntur",
+            "skill": "Teaching",
+            "urgency": "Low"
+        },
+        {
+            "task": "Logistics Coordination",
+            "location": "Hyderabad",
+            "skill": "Logistics",
+            "urgency": "High"
+        }
+    ]
+tasks = st.session_state.get("tasks", [])
+
+df = pd.DataFrame(tasks) if tasks else pd.DataFrame(columns=["task", "location", "urgency", "skill"])
 
 # ---------------------------
 # AVAILABILITY
 # ---------------------------
 st.markdown("## ⏰ Availability")
 availability = st.radio("Are you available?", ["Yes", "No"])
+
+# ---------------------------
+# METRICS (SAFE)
+# ---------------------------
+col1, col2 = st.columns(2)
+
+col1.metric("👥 Volunteers", len(st.session_state.get("users", {})))
+col2.metric("📌 Tasks", len(tasks))
+
+# ---------------------------
+# GRAPHS (SAFE CHECKS)
+# ---------------------------
+if not df.empty:
+
+    st.markdown("## 🧠 Skill Demand")
+    skill_counts = df["skill"].value_counts()
+
 
 # ---------------------------
 # MATCHING LOGIC
@@ -134,23 +175,15 @@ def calculate_score(user, task):
     return score
 
 # ---------------------------
-# ASSIGN TASK
+# TASK ASSIGNMENT
 # ---------------------------
 if availability == "Yes":
-
-    tasks = st.session_state.tasks
 
     if not tasks:
         st.warning("⚠️ No tasks available right now.")
     else:
-        best_task = None
-        best_score = -1
 
-        for task in tasks:
-            score = calculate_score(user, task)
-            if score > best_score:
-                best_score = score
-                best_task = task
+        best_task = max(tasks, key=lambda t: calculate_score(user, t))
 
         st.success("✅ Task Assigned!")
 
@@ -173,15 +206,15 @@ if availability == "Yes":
             st.error("🚨 HIGH PRIORITY TASK")
 
 # ---------------------------
-# LIVE DASHBOARD
+# LIVE DATA
 # ---------------------------
 st.markdown("## 📊 Live System Data")
 
-st.write("👥 Total Volunteers:", len(st.session_state.users))
-st.write("📌 Total Tasks:", len(st.session_state.tasks))
+st.write("👥 Total Volunteers:", len(st.session_state.get("users", {})))
+st.write("📌 Total Tasks:", len(tasks))
 
 # ---------------------------
-# INTERACTIVE FEATURE
+# MOTIVATION
 # ---------------------------
 if st.button("🎲 Get Motivation"):
     quotes = [
@@ -192,8 +225,7 @@ if st.button("🎲 Get Motivation"):
     st.success(random.choice(quotes))
 
 # ---------------------------
-# RANDOM LIVE ALERT
+# ALERT
 # ---------------------------
 if random.random() > 0.7:
-    st.info("⚡ New urgent request just arrived!")
-
+    st.info("⚡ New urgent request just arrived!")  
