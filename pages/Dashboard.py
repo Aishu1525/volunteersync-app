@@ -1,18 +1,23 @@
 import streamlit as st
+st.write(st.secrets)
 import pandas as pd
 import random
 from google import genai
 
+api_key = st.secrets.get("GEMINI_API_KEY")
 
-client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+if not api_key:
+    st.error("API key not found")
+    st.stop()
+
+client = genai.Client(api_key=api_key)
 
 st.title("Gemini Test")
 
-# ---------------- TEST BUTTON ----------------
 if st.button("Test Gemini"):
     response = client.models.generate_content(
         model="gemini-2.5-flash",
-        contents="Say hello and confirm you are working"
+        contents="Say hello"
     )
     st.write(response.text)
 
