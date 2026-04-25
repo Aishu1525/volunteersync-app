@@ -3,6 +3,14 @@ import pandas as pd
 import random
 from google import genai
 
+# ---------------------------
+# PAGE CONFIG (FIRST)
+# ---------------------------
+st.set_page_config(layout="wide")
+
+# ---------------------------
+# API SETUP
+# ---------------------------
 api_key = st.secrets.get("GEMINI_API_KEY")
 
 if not api_key:
@@ -10,7 +18,6 @@ if not api_key:
     st.stop()
 
 client = genai.Client(api_key=api_key)
-
 st.title("Gemini Test")
 
 if st.button("Test Gemini"):
@@ -19,13 +26,15 @@ if st.button("Test Gemini"):
         contents="Say hello"
     )
     st.write(response.text)
-
-# ---------------- VOLUNTEERS ----------------
+# ---------------------------
+# VOLUNTEERS DATA
+# ---------------------------
 volunteers = [
     {"name": "Asha", "skills": "teaching, english", "location": "Guntur", "availability": "weekends"},
     {"name": "Rahul", "skills": "medical, first aid", "location": "Vijayawada", "availability": "full-time"},
     {"name": "Divya", "skills": "data entry, admin", "location": "Guntur", "availability": "weekdays"}
 ]
+
 # ---------------------------
 # AI MATCH FUNCTION (FIXED)
 # ---------------------------
