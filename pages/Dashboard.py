@@ -3,31 +3,29 @@ import pandas as pd
 import random
 from google import genai
 
-# ---------------------------
-# PAGE CONFIG (FIRST)
-# ---------------------------
-st.set_page_config(layout="wide")
-
-# ---------------------------
-# API SETUP
-# ---------------------------
 api_key = st.secrets.get("GEMINI_API_KEY")
 
 if not api_key:
-    st.error("API key not found. Please add GEMINI_API_KEY in Streamlit Secrets.")
+    st.error("API key not found")
     st.stop()
 
 client = genai.Client(api_key=api_key)
 
-# ---------------------------
-# VOLUNTEERS DATA
-# ---------------------------
+st.title("Gemini Test")
+
+if st.button("Test Gemini"):
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents="Say hello"
+    )
+    st.write(response.text)
+
+# ---------------- VOLUNTEERS ----------------
 volunteers = [
     {"name": "Asha", "skills": "teaching, english", "location": "Guntur", "availability": "weekends"},
     {"name": "Rahul", "skills": "medical, first aid", "location": "Vijayawada", "availability": "full-time"},
     {"name": "Divya", "skills": "data entry, admin", "location": "Guntur", "availability": "weekdays"}
 ]
-
 # ---------------------------
 # AI MATCH FUNCTION (FIXED)
 # ---------------------------
