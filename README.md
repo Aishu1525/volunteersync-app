@@ -96,8 +96,8 @@ The system assigns tasks using a **data-driven scoring model**:
 
 ## 🌐 Prototype
 
-🔗 Live Demo: 
-🎥 Demo Video: 
+🔗 Live Demo: https://volunteersync-app-zmgemxn9zzdmmci9ukwn8o.streamlit.app/
+🎥 Demo Video: https://drive.google.com/file/d/1Tzes56n8DM_tyHof5h4XZQ9s23PhzV5D/view?usp=sharing
 
 
 
