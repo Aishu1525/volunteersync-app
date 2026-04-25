@@ -4,7 +4,7 @@ import random
 import streamlit as st
 from google import genai
 
-client = genai.Client(api_key="AIzaSyAHMrDHvG1Pt6Hkb9WvIdp4AY5qAWVbNbU")
+client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
 
 st.title("Gemini Test")
 
