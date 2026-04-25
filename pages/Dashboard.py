@@ -1,5 +1,4 @@
 import streamlit as st
-st.write(st.secrets)
 import pandas as pd
 import random
 from google import genai
