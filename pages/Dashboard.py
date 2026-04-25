@@ -1,9 +1,55 @@
 import streamlit as st
 import pandas as pd
-
 import random
+import streamlit as st
+from google import genai
 
-# ---------------------------
+client = genai.Client(api_key="AIzaSyAHMrDHvG1Pt6Hkb9WvIdp4AY5qAWVbNbU")
+
+st.title("Gemini Test")
+
+# ---------------- TEST BUTTON ----------------
+if st.button("Test Gemini"):
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents="Say hello and confirm you are working"
+    )
+    st.write(response.text)
+
+# ---------------- VOLUNTEERS ----------------
+volunteers = [
+    {"name": "Asha", "skills": "teaching, english", "location": "Guntur", "availability": "weekends"},
+    {"name": "Rahul", "skills": "medical, first aid", "location": "Vijayawada", "availability": "full-time"},
+    {"name": "Divya", "skills": "data entry, admin", "location": "Guntur", "availability": "weekdays"}
+]
+
+# ---------------- AI MATCH FUNCTION ----------------
+def smart_match(task, volunteers):
+    prompt = f"""
+You are an AI assistant for Smart Volunteer Resource Allocation System.
+
+TASK:
+{task}
+
+VOLUNTEERS:
+{volunteers}
+
+Match best volunteers, rank them, and explain reasoning.
+"""
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
+    )
+
+    return response.text
+
+# ---------------- UI ----------------
+task = st.text_area("Enter Task")
+
+if st.button("Find Best Volunteers"):
+    result = smart_match(task, volunteers)
+    st.write(result)# ---------------------------
 # PAGE CONFIG (MUST BE FIRST)
 # ---------------------------
 st.set_page_config(layout="wide")
@@ -229,3 +275,12 @@ if st.button("🎲 Get Motivation"):
 # ---------------------------
 if random.random() > 0.7:
     st.info("⚡ New urgent request just arrived!")  
+st.title("Smart Resource Allocation System 🤝")
+
+task = st.text_area("Enter NGO Task Description")
+
+if st.button("Get Smart Matches"):
+    if task:
+        result = smart_match(task, volunteers)
+        st.markdown("### AI Recommendations")
+        st.write(result)
